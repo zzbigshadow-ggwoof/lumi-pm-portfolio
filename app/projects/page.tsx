@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import ImagePlaceholder from '@/components/ImagePlaceholder';
 import SectionTitle from '@/components/SectionTitle';
 import Tag from '@/components/Tag';
@@ -14,6 +15,20 @@ export default function ProjectsPage() {
         title="其他项目"
         desc="轻量化项目合集：增长、平台化、数据工具等方向的实践。"
       />
+      <Link
+        href="/projects/app"
+        className="lift mb-6 flex flex-col gap-4 rounded-2xl border border-line bg-surface p-6 transition hover:border-mint/40 sm:flex-row sm:items-center"
+      >
+        <div className="flex-1">
+          <p className="text-xs tracking-[0.2em] text-mint/70">CASE · 移动端</p>
+          <h3 className="mt-2 text-lg font-semibold text-white">脑波灯配套 APP</h3>
+          <p className="mt-2 text-sm leading-relaxed text-body">
+            硬件的遥控器与说明书。含可点击的交互原型：连接设备、调节灯光、冥想计时。
+          </p>
+        </div>
+        <span className="shrink-0 text-sm text-mint">查看案例 →</span>
+      </Link>
+
       <div className="grid gap-6 sm:grid-cols-2">
         {otherProjects.map((p, i) => (
           <RevealOnScroll key={p.title} delay={(i % 2) * 90}>

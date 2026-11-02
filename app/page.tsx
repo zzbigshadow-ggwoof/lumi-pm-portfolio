@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import ImagePlaceholder from '@/components/ImagePlaceholder';
+import AppPrototype from '@/components/app/AppPrototype';
 import RevealOnScroll from '@/components/RevealOnScroll';
 import SectionTitle from '@/components/SectionTitle';
 import Tag from '@/components/Tag';
@@ -65,10 +66,42 @@ export default function Home() {
                 </p>
               </div>
               <div className="p-6 md:p-8">
-                <ImagePlaceholder label="Lumi 项目头图占位" ratio="aspect-[4/3] md:aspect-auto md:h-full" hint={lumi.hero.heroImageHint} />
+                <ImagePlaceholder label="Lumi 脑波灯实物" src="/images/lamp-desk.jpg" ratio="aspect-[4/3] md:aspect-auto md:h-full" />
               </div>
             </div>
           </Link>
+        </section>
+      </RevealOnScroll>
+
+      {/* 配套 APP 入口 */}
+      <RevealOnScroll>
+        <section className="py-16">
+          <SectionTitle index="SOFTWARE" title="配套 APP" desc="硬件的遥控器与说明书，含可点击的交互原型。" />
+          <div className="grid gap-0 md:grid-cols-2">
+            <div className="order-2 p-6 md:order-1 md:p-8">
+              <div className="mb-4 flex flex-wrap gap-2">
+                {['ToC', '移动端', '硬件交互'].map((t) => <Tag key={t}>{t}</Tag>)}
+              </div>
+              <h3 className="text-2xl font-semibold text-white">脑波灯配套 APP</h3>
+              <p className="mt-2 text-sm text-mint">三种模式 · 灯光调节 · 冥想计时</p>
+              <p className="mt-4 text-sm leading-relaxed text-body">
+                把一台没有屏幕的硬件，压缩成一个普通人能看懂、能按的界面。
+                连接设备、调灯光颜色、选音效与时长，到冥想结束。
+              </p>
+              <Link
+                href="/projects/app"
+                className="mt-6 inline-flex items-center gap-1 text-sm text-mint hover:underline"
+              >
+                体验交互原型
+                <span>→</span>
+              </Link>
+            </div>
+            <div className="order-1 flex items-center justify-center overflow-hidden bg-[#22261f] p-4 md:order-2 md:p-6">
+              <div className="origin-center scale-[0.78]">
+                <AppPrototype />
+              </div>
+            </div>
+          </div>
         </section>
       </RevealOnScroll>
 

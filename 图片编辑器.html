@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>作品集图片编辑器</title>
+<style>
+  :root { --ink:#121418; --surface:#181B20; --mint:#87E8DE; --body:#C9D1D9; --muted:#8B949E; --line:rgba(135,232,222,.18); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--ink); color:var(--body); font-family:-apple-system,"PingFang SC",sans-serif; min-height:100vh; }
+  header { padding:16px 24px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+  header h1 { font-size:16px; color:var(--mint); font-weight:600; }
+  .presets { display:flex; gap:8px; flex-wrap:wrap; }
+  .preset { padding:6px 12px; border:1px solid var(--line); border-radius:8px; background:var(--surface); color:var(--body); font-size:13px; cursor:pointer; }
+  .preset.active { border-color:var(--mint); color:var(--mint); }
+  main { display:flex; gap:24px; padding:24px; flex-wrap:wrap; }
+  #stageWrap { position:relative; background:#0C0E11; border:1px solid var(--line); border-radius:12px; overflow:hidden; width:720px; height:520px; flex-shrink:0; }
+  #stage { display:block; width:100%; height:100%; cursor:grab; }
+  #stage.dragging { cursor:grabbing; }
+  #frame { position:absolute; border:2px solid var(--mint); box-shadow:0 0 0 9999px rgba(10,12,14,.72); pointer-events:none; }
+  #dropTip { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; color:var(--muted); font-size:14px; text-align:center; padding:24px; }
+  #dropTip strong { color:var(--mint); font-size:16px; }
+  aside { flex:1; min-width:260px; max-width:340px; display:flex; flex-direction:column; gap:18px; }
+  .group { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px; }
+  .group h2 { font-size:13px; color:var(--mint); margin-bottom:12px; font-weight:600; }
+  .row { display:flex; align-items:center; gap:10px; margin-bottom:10px; font-size:13px; }
+  .row label { width:52px; color:var(--muted); flex-shrink:0; }
+  .row input[type=range] { flex:1; accent-color:var(--mint); }
+  .row .val { width:36px; text-align:right; color:var(--muted); font-variant-numeric:tabular-nums; }
+  select, input[type=text] { background:var(--ink); color:var(--body); border:1px solid var(--line); border-radius:8px; padding:6px 10px; font-size:13px; width:100%; }
+  .btn { padding:10px 18px; border-radius:10px; border:1px solid var(--line); background:var(--surface); color:var(--body); font-size:14px; cursor:pointer; }
+  .btn:hover { border-color:var(--mint); }
+  .btn.primary { background:var(--mint); color:#0C0E11; border-color:var(--mint); font-weight:600; }
+  .btnrow { display:flex; gap:10px; }
+  .hint { font-size:12px; color:var(--muted); line-height:1.8; }
+  .hint code { color:var(--mint); }
+</style>
+</head>
+<body>
+<header>
+  <h1>作品集图片编辑器</h1>
+  <div class="presets" id="presets"></div>
+</header>
+<main>
+  <div id="stageWrap">
+    <canvas id="stage"></canvas>
+    <div id="frame"></div>
+    <div id="dropTip">
+      <strong>把图片拖到这里</strong>
+      <span>或点击选择文件（支持 JPG / PNG）</span>
+      <span>左上方先选好要替换的位置，裁剪框会自动锁定对应比例</span>
+    </div>
+    <input type="file" id="file" accept="image/*" hidden>
+  </div>
+  <aside>
+    <div class="group">
+      <h2>调整</h2>
+      <div class="row"><label>缩放</label><input type="range" id="zoom" min="100" max="400" value="100"><span class="val" id="zoomV">100</span></div>
+      <div class="row"><label>亮度</label><input type="range" id="bright" min="40" max="180" value="100"><span class="val" id="brightV">100</span></div>
+      <div class="row"><label>对比度</label><input type="range" id="contrast" min="40" max="180" value="100"><span class="val" id="contrastV">100</span></div>
+      <div class="row"><label>饱和度</label><input type="range" id="saturate" min="0" max="200" value="100"><span class="val" id="saturateV">100</span></div>
+      <div class="btnrow">
+        <button class="btn" id="rotate">旋转 90°</button>
+        <button class="btn" id="reset">重置</button>
+      </div>
+    </div>
+    <div class="group">
+      <h2>导出</h2>
+      <div class="row"><label>文件名</label><input type="text" id="fname" value="lumi-scene.jpg"></div>
+      <div class="hint" style="margin-bottom:12px">导出后用下载的图<strong>直接覆盖</strong> <code>public/images/</code> 里的同名文件，再双击「部署上线.command」。</div>
+      <button class="btn primary" id="export" style="width:100%">导出图片</button>
+    </div>
+    <div class="group">
+      <h2>操作</h2>
+      <div class="hint" style="margin-bottom:10px">拖动画面移动位置 · 滚轮或滑杆缩放 · 薄荷蓝框内就是最终效果</div>
+      <button class="btn" id="pick" style="width:100%">重新选择图片</button>
+    </div>
+  </aside>
+</main>
+<script>
+const SLOTS = [
+  { name:'Lumi 页头图',  file:'lumi-scene.jpg',      ratio:16/9,  outW:1600, type:'image/jpeg' },
+  { name:'首页 Lumi 卡片', file:'lumi-hero.jpg',       ratio:4/3,   outW:1600, type:'image/jpeg' },
+  { name:'APP 截图',     file:'lumi-app.png',        ratio:9/16,  outW:800,  type:'image/png'  },
+  { name:'使用流程图',    file:'lumi-flow.jpg',       ratio:9/16,  outW:1000, type:'image/jpeg' },
+  { name:'硬件产品图',    file:'lumi-lamp-blue.png',  ratio:4/3,   outW:1200, type:'image/png'  },
+  { name:'自由导出',      file:'my-image.jpg',        ratio:16/9,  outW:1600, type:'image/jpeg' },
+];
+const wrap = document.getElementById('stageWrap'), cv = document.getElementById('stage'),
+      ctx = cv.getContext('2d'), frame = document.getElementById('frame'),
+      dropTip = document.getElementById('dropTip'), fileInput = document.getElementById('file'),
+      fname = document.getElementById('fname');
+let img = null, slot = SLOTS[0], rot = 0, tx = 0, ty = 0, scale = 1, fitScale = 1;
+const W = 720, H = 520; cv.width = W; cv.height = H;
+
+// 预设按钮
+const presetBox = document.getElementById('presets');
+SLOTS.forEach((s, i) => {
+  const b = document.createElement('button');
+  b.className = 'preset' + (i === 0 ? ' active' : '');
+  b.textContent = s.name;
+  b.onclick = () => {
+    slot = s; fname.value = s.file;
+    document.querySelectorAll('.preset').forEach(p => p.classList.remove('active'));
+    b.classList.add('active');
+    layout(); if (img) fit();
+  };
+  presetBox.appendChild(b);
+});
+
+function frameRect() {
+  const pad = 24;
+  let fw = W - pad*2, fh = fw / slot.ratio;
+  if (fh > H - pad*2) { fh = H - pad*2; fw = fh * slot.ratio; }
+  return { x:(W-fw)/2, y:(H-fh)/2, w:fw, h:fh };
+}
+function layout() {
+  const r = frameRect();
+  Object.assign(frame.style, { left:r.x+'px', top:r.y+'px', width:r.w+'px', height:r.h+'px' });
+}
+layout();
+
+function iw() { return rot % 180 === 0 ? img.width : img.height; }
+function ih() { return rot % 180 === 0 ? img.height : img.width; }
+
+function fit() {
+  const r = frameRect();
+  fitScale = Math.max(r.w / iw(), r.h / ih());
+  scale = fitScale;
+  document.getElementById('zoom').value = 100;
+  document.getElementById('zoomV').textContent = 100;
+  tx = W/2; ty = H/2;
+  clamp(); draw();
+}
+function clamp() {
+  const r = frameRect(), dw = iw()*scale/2, dh = ih()*scale/2;
+  tx = Math.min(Math.max(tx, r.x + r.w - dw), r.x + dw);
+  ty = Math.min(Math.max(ty, r.y + r.h - dh), r.y + dh);
+}
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  if (!img) return;
+  ctx.save();
+  ctx.filter = `brightness(${bright.value}%) contrast(${contrast.value}%) saturate(${saturate.value}%)`;
+  ctx.translate(tx, ty);
+  ctx.rotate(rot * Math.PI / 180);
+  ctx.scale(scale, scale);
+  ctx.drawImage(img, -img.width/2, -img.height/2);
+  ctx.restore();
+}
+
+function load(file) {
+  if (!file || !file.type.startsWith('image/')) return;
+  const url = URL.createObjectURL(file);
+  const im = new Image();
+  im.onload = () => { img = im; rot = 0; dropTip.style.display = 'none'; fit(); };
+  im.src = url;
+}
+wrap.addEventListener('click', () => { if (!img) fileInput.click(); });
+document.getElementById('pick').onclick = () => fileInput.click();
+fileInput.onchange = e => load(e.target.files[0]);
+wrap.addEventListener('dragover', e => e.preventDefault());
+wrap.addEventListener('drop', e => { e.preventDefault(); load(e.dataTransfer.files[0]); });
+
+// 拖动 & 滚轮
+let drag = null;
+cv.addEventListener('mousedown', e => { drag = { x:e.offsetX - tx, y:e.offsetY - ty }; cv.classList.add('dragging'); });
+window.addEventListener('mousemove', e => {
+  if (!drag) return;
+  const b = cv.getBoundingClientRect();
+  tx = e.clientX - b.left - drag.x;
+  ty = e.clientY - b.top - drag.y;
+  clamp(); draw();
+});
+window.addEventListener('mouseup', () => { drag = null; cv.classList.remove('dragging'); });
+cv.addEventListener('wheel', e => {
+  if (!img) return;
+  e.preventDefault();
+  const k = e.deltaY < 0 ? 1.05 : 0.95;
+  scale = Math.min(fitScale*4, Math.max(fitScale, scale * k));
+  document.getElementById('zoom').value = Math.round(scale / fitScale * 100);
+  document.getElementById('zoomV').textContent = Math.round(scale / fitScale * 100);
+  clamp(); draw();
+}, { passive:false });
+
+// 滑杆
+const $ = id => document.getElementById(id);
+zoom.oninput = () => { if (!img) return; scale = fitScale * zoom.value / 100; zoomV.textContent = zoom.value; clamp(); draw(); };
+[['bright','brightV'],['contrast','contrastV'],['saturate','saturateV']].forEach(([id, v]) => {
+  $(id).oninput = () => { $(v).textContent = $(id).value; draw(); };
+});
+rotate.onclick = () => { if (!img) return; rot = (rot + 90) % 360; fitScale = Math.max(frameRect().w / iw(), frameRect().h / ih()); scale = Math.max(scale, fitScale); clamp(); draw(); };
+reset.onclick = () => { bright.value = contrast.value = saturate.value = 100; brightV.textContent = contrastV.textContent = saturateV.textContent = 100; if (img) { rot = 0; fit(); } };
+
+// 导出
+exportBtn = document.getElementById('export');
+exportBtn.onclick = () => {
+  if (!img) { alert('先拖一张图片进来'); return; }
+  const r = frameRect(), outW = slot.outW, outH = Math.round(outW / slot.ratio), k = outW / r.w;
+  const out = document.createElement('canvas'); out.width = outW; out.height = outH;
+  const o = out.getContext('2d');
+  o.filter = `brightness(${bright.value}%) contrast(${contrast.value}%) saturate(${saturate.value}%)`;
+  o.translate((tx - r.x) * k, (ty - r.y) * k);
+  o.rotate(rot * Math.PI / 180);
+  o.scale(scale * k, scale * k);
+  o.drawImage(img, -img.width/2, -img.height/2);
+  out.toBlob(blob => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = fname.value.trim() || slot.file;
+    a.click();
+  }, slot.type, 0.88);
+};
+</script>
+</body>
+</html>

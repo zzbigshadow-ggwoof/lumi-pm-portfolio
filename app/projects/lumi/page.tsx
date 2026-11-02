@@ -5,6 +5,7 @@ import RevealOnScroll from '@/components/RevealOnScroll';
 import ArchDiagram from '@/components/lumi/ArchDiagram';
 import FlywheelDiagram from '@/components/lumi/FlywheelDiagram';
 import SolutionTabs from '@/components/lumi/SolutionTabs';
+import LampDemo from '@/components/lumi/LampDemo';
 import { lumi } from '@/data/lumi';
 
 export const metadata = {
@@ -32,8 +33,25 @@ export default function LumiPage() {
         <p className="enter mt-6 max-w-3xl text-base leading-relaxed text-body" style={{ animationDelay: '260ms' }}>
           {d.hero.oneLiner}
         </p>
+        <div
+          className="enter mt-8 flex flex-wrap gap-x-10 gap-y-3 text-sm"
+          style={{ animationDelay: '320ms' }}
+        >
+          <div>
+            <p className="text-xs text-muted">项目周期</p>
+            <p className="mt-1 text-white">{d.hero.period}</p>
+          </div>
+          <div>
+            <p className="text-xs text-muted">我的角色</p>
+            <p className="mt-1 text-white">{d.hero.role}</p>
+          </div>
+          <div>
+            <p className="text-xs text-muted">版本节奏</p>
+            <p className="mt-1 text-white">V1.0 → V1.3</p>
+          </div>
+        </div>
         <div className="enter mt-10" style={{ animationDelay: '360ms' }}>
-          <ImagePlaceholder label="项目头图占位：头戴 + 脑波灯 + 香薰灯实拍" ratio="aspect-[16/9]" hint={d.hero.heroImageHint} />
+          <ImagePlaceholder label="Lumi 脑波疗愈场景" src="/images/lumi-scene.jpg" ratio="aspect-[16/9]" />
         </div>
       </section>
 
@@ -157,6 +175,14 @@ export default function LumiPage() {
         <section className="border-t border-line py-16">
           <SectionTitle index="06 / SOLUTIONS" title="双端方案" />
           <SolutionTabs />
+
+          <div className="mt-12">
+            <h3 className="text-lg font-semibold text-white">灯光演示</h3>
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-body">
+              产品的核心输出是光。四种灯色对应四种状态，由 APP 下发指令实时切换——下面是自己做的实物，可以点颜色看变化。
+            </p>
+            <LampDemo />
+          </div>
         </section>
       </RevealOnScroll>
 
@@ -180,7 +206,8 @@ export default function LumiPage() {
                   <span className="absolute -top-3 left-6 rounded-full bg-mint px-3 py-0.5 text-xs font-semibold text-ink">
                     {m.version}
                   </span>
-                  <h4 className="mt-2 font-semibold text-white">{m.title}</h4>
+                  <p className="mt-4 text-xs font-mono text-muted">{m.date}</p>
+                  <h4 className="mt-1 font-semibold text-white">{m.title}</h4>
                   <p className="mt-2 text-sm leading-relaxed text-body">{m.desc}</p>
                 </div>
               ))}

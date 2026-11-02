@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import ImagePlaceholder from '@/components/ImagePlaceholder';
 import { lumi } from '@/data/lumi';
 
@@ -28,11 +29,16 @@ export default function SolutionTabs() {
       {tab === 'toc' ? (
         <div key="toc" className="tab-panel grid gap-6 md:grid-cols-2">
           <div className="space-y-4">
-            <ImagePlaceholder label="APP 截图占位 1" ratio="aspect-[9/16] max-h-[420px]" hint={t.toc.appShotHint} />
-            <ImagePlaceholder label="APP 截图占位 2" ratio="aspect-[9/16] max-h-[420px]" hint={t.toc.appShotHint} />
+            <ImagePlaceholder label="Lumi 夜眠灯产品实拍" src="/images/lumi-lamp.jpg" ratio="aspect-[4/3]" />
+            <Link
+              href="/projects/app"
+              className="lift flex items-center justify-between rounded-xl border border-line bg-surface px-5 py-4 text-sm text-body hover:border-mint/50 hover:text-mint"
+            >
+              在手机上体验配套 APP 交互原型
+              <span>→</span>
+            </Link>
           </div>
           <div className="space-y-6">
-            <ImagePlaceholder label="硬件实拍占位" ratio="aspect-[4/3]" hint={t.toc.hardwareHint} />
             {t.toc.sections.map((s) => (
               <div key={s.heading} className="lift rounded-xl border border-line bg-surface p-5 hover:border-mint/40">
                 <h4 className="font-semibold text-mint">{s.heading}</h4>

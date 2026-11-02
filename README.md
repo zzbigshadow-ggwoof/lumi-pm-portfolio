@@ -1,6 +1,10 @@
 # Lumi PM Portfolio
 
-软硬一体 / 非侵入脑机方向 PM 个人作品集网站。Next.js 14 + TailwindCSS，纯静态导出，可一键部署 Vercel。
+软硬一体 / 非侵入脑机方向 PM 个人作品集网站。Next.js 14 + TailwindCSS，纯静态导出，部署到 Netlify。
+
+## 线上地址
+
+https://papaya-blancmange-11546c.netlify.app
 
 ## 本地预览
 
@@ -10,39 +14,30 @@ npm run dev
 # 打开 http://localhost:3000（支持 Trae 内置预览）
 ```
 
-## 怎么发给别人看（三种方式）
-
-### 方式 A：Vercel 部署，拿公开链接转发（推荐，免费）
-
-1. 把代码推到 GitHub：
-   ```bash
-   git init && git add . && git commit -m "init"
-   # 在 GitHub 新建仓库后：
-   git remote add origin https://github.com/<你的用户名>/<仓库名>.git
-   git push -u origin main
-   ```
-2. 打开 [vercel.com](https://vercel.com) → **Add New Project** → 导入该仓库 → Framework 自动识别 Next.js → **Deploy**
-3. 1 分钟左右拿到形如 `https://your-portfolio.vercel.app` 的链接，**直接发给 HR / 面试官**即可
-4. 以后每次 push，Vercel 自动重新部署
-
-### 方式 B：拖拽上线（不碰 Git，最快 30 秒）
-
-1. 本地执行 `npm run build`，会生成 `out/` 文件夹
-2. 打开 [app.netlify.com/drop](https://app.netlify.com/drop)，把 `out/` 文件夹整个拖进去
-3. 立刻得到一个公开链接
-
-### 方式 C：同一 WiFi 下给别人看（临时演示）
+## 改完代码怎么上线（一行命令）
 
 ```bash
-npm run dev -- -H 0.0.0.0
-# 然后把你电脑的局域网 IP（如 http://192.168.1.8:3000）发给对方
+npm run deploy
 ```
+
+会自动构建 `out/` 并部署到 Netlify 生产环境。约 1 分钟后线上地址更新。
+
+> 本项目已通过 Netlify CLI 链接到站点 `papaya-blancmange-11546c`，CLI 凭证已保存。
+> 本地放了一份 Node 20（`.tools/`），因为 netlify-cli 与系统 Node 26 不兼容；脚本已自动用它，不用管。
+
+## 怎么发给别人看
+
+直接把线上链接发出去即可：**https://papaya-blancmange-11546c.netlify.app**
+
+如需换个好看的名字：Netlify 后台 → Site configuration → Change site name。
 
 ### 绑定自定义域名
 
-Vercel 项目 → **Settings → Domains** → 添加域名 → 按提示配置 DNS：
-- 根域名：A 记录指向 `76.76.21.21`
-- 子域名：CNAME 指向 `cname.vercel-dns.com`
+Netlify 后台 → Site configuration → Domain management → Add custom domain，按提示配置 DNS（CNAME 指向 Netlify）。
+
+### （可选）绑定 GitHub 自动部署
+
+如果你能访问 GitHub（需代理），可在 Netlify 站点后台 → Site configuration → Build & deploy → Continuous deployment → Link repository，绑定仓库后每次 `git push` 自动构建部署。没有代理时用上面的 `npm run deploy` 即可。
 
 ## 怎么自己改内容
 

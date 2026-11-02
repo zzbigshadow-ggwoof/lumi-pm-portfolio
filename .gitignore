@@ -4,3 +4,9 @@ out
 *.tsbuildinfo
 next-env.d.ts
 .DS_Store
+
+# Local Netlify folder
+.netlify
+
+# Local Node 20 runtime (downloaded for netlify-cli compatibility)
+.tools

@@ -6,6 +6,8 @@ export const lumi = {
     title: 'Lumi 脑波感知疗愈生态',
     subtitle: '软硬一体脑机 ToB2ToC 项目',
     roleTags: ['产品经理', '软硬一体', '非侵入脑机', 'ToB2ToC'],
+    period: '2026.04 — 至今',
+    role: '产品负责人',
     oneLiner:
       '以脑波 SDK 为底座，一套能力支撑 ToC 消费硬件和 ToB 算法服务，搭建「采集 — 解析 — 声光反馈 — 数据沉淀」闭环。',
     heroImageHint: '建议替换：头戴 + 脑波灯 + 香薰灯实拍图（16:9，≥1600px 宽）',
@@ -98,10 +100,10 @@ export const lumi = {
   },
 
   milestones: [
-    { version: 'V1.0', title: '打通链路', desc: '头戴-灯-APP 脑波闭环跑通，内部 Demo 发布' },
-    { version: 'V1.1', title: '香薰联动', desc: '香薰灯接入反馈层，声光味多感官联动上线' },
-    { version: 'V1.2', title: 'APP 上架', desc: 'iOS / Android 双端上架，开启套装预售' },
-    { version: 'V1.3', title: 'SDK 对外交付', desc: '标准化 SDK 交付包发布，签下首个 ToB 客户' },
+    { version: 'V1.0', date: '2026.05', title: '打通链路', desc: '头戴-灯-APP 脑波闭环跑通，内部 Demo 发布' },
+    { version: 'V1.1', date: '2026.07', title: '香薰联动', desc: '香薰灯接入反馈层，声光味多感官联动上线' },
+    { version: 'V1.2', date: '2026.09', title: 'APP 上架', desc: 'iOS / Android 双端上架，开启套装预售' },
+    { version: 'V1.3', date: '2026.11', title: 'SDK 对外交付', desc: '标准化 SDK 交付包发布，签下首个 ToB 客户' },
   ],
 
   outcomes: {

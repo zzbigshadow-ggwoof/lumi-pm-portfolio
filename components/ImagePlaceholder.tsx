@@ -8,15 +8,23 @@ export default function ImagePlaceholder({
   ratio = 'aspect-[16/9]',
   hint,
   src,
+  fit = 'cover',
 }: {
   label: string;
   ratio?: string;
   hint?: string;
   src?: string; // 若提供 src 则直接渲染图片
+  fit?: 'cover' | 'contain'; // contain 用于透明底产品图，避免裁剪
 }) {
   if (src) {
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={src} alt={label} className={`w-full rounded-xl border border-line object-cover ${ratio}`} />;
+    return (
+      <img
+        src={src}
+        alt={label}
+        className={`w-full rounded-xl border border-line bg-surface ${fit === 'contain' ? 'object-contain p-6' : 'object-cover'} ${ratio}`}
+      />
+    );
   }
   return (
     <div
